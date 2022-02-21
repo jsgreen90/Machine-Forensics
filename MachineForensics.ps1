@@ -37,12 +37,12 @@ function Get-ServiceHash {
     }
 }
 
-function Retrieve-Services {
+function Get-SortedServices {
     Get-Service | Sort-Object Status -Descending
 }
 
 #process information combining wmi with PS to get usernames and commandline as well
-function Retrieve-Processes {
+function Get-EnrichedProcesses {
   $ProcInfo1 = Get-WmiObject win32_process | select processname, ProcessId, CommandLine | Sort-Object processname
   foreach ($proc in $ProcInfo1){
    $ProcInfo2 = Get-Process -Id $proc.ProcessId -IncludeUserName | Select-Object UserName
@@ -173,9 +173,9 @@ Get-Connections | Export-Csv -Path ([System.IO.Path]::Combine($SaveFolder,"$pc.c
 Write-Host "Collecting Scheduled Tasks" -ForegroundColor Yellow
 Get-Tasks | Export-Csv -Path ([System.IO.Path]::Combine($SaveFolder,"$pc.ScheduledTasks.csv")) -NoTypeInformation
 Write-Host "Collecting Process Information" -ForegroundColor Yellow
-Retrieve-Processes | Export-Csv -Path ([System.IO.Path]::Combine($SaveFolder,"$pc.processes.csv")) -NoTypeInformation
+Get-EnrichedProcesses | Export-Csv -Path ([System.IO.Path]::Combine($SaveFolder,"$pc.processes.csv")) -NoTypeInformation
 Write-Host "Collecting Services" -ForegroundColor Yellow
-Retrieve-Services | Export-Csv -Path ([System.IO.Path]::Combine($SaveFolder,"$pc.services.csv")) -NoTypeInformation
+Get-SortedServices | Export-Csv -Path ([System.IO.Path]::Combine($SaveFolder,"$pc.services.csv")) -NoTypeInformation
 Write-Host "Collecting Mapped Drives" -ForegroundColor Yellow
 Get-MappedDrives | Export-Csv -Path ([System.IO.Path]::Combine($SaveFolder,"$pc.mappeddrives.csv")) -NoTypeInformation
 Write-Host "Collecting File Shares" -ForegroundColor Yellow
